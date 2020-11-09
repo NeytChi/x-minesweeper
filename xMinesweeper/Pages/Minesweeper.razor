@@ -1,0 +1,54 @@
+@page "/minesweeper"
+
+@using xMinesweeper.GameLogic
+@using xMinesweeper.Data
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navManager
+
+<h1>Minesweeper</h1>
+
+@code {
+    GameControl _control = new GameControl();
+
+    public void FaceOooh()
+    {
+        _jsRuntime.InvokeVoidAsync("faceOooh");
+    }
+}
+@if (_control.IsWinGame())
+{
+    <div class="smile win" @onclick="@(() => _control.Reset())"></div>
+}
+else
+{
+    if (_control.IsLoseGame())
+    {
+        <div class="smile lose" @onclick="@(() => _control.Reset())"></div>
+    }
+    else
+    {
+        <div class="smile reset" id="face" @oncontextmenu:preventDefault @onmousedown="@(() => FaceOooh())" onmouseup="faceReset()"
+             @onclick="@(() => _control.Reset())"></div>
+    }
+}
+
+<table>
+    @for (int i = 0; i < PanelSettings.Width; i++)
+    {
+        <tr>
+            @for (int j = 0; j < PanelSettings.Height; j++)
+            {
+                int x = i;
+                int y = j;
+                <td>
+                    <div class="panel-piece @_control.Panel.Pieces[x, y].GetPieceState()"
+                         @onclick="@(() =>_control.TryOpenPiece(x, y))"
+                         @oncontextmenu:preventDefault @oncontextmenu="@(() => _control.SetFlag(x, y))"></div>
+                </td>
+            }
+        </tr>
+
+    }
+</table>
+
+
